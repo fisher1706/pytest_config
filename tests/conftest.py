@@ -1,7 +1,11 @@
 import pytest
 
 
-# TODO: pytest --environment='preprod' -vs -> start tests on "preprod"
+"""
+1. добавляем хуком "pytest_addoption" переменную "environment" в "pytestconfig"
+"""
+
+
 def pytest_addoption(parser):
     parser.addoption(
         "--environment",
@@ -11,11 +15,9 @@ def pytest_addoption(parser):
     )
 
 
-def pytest_configure(config):
-    if config.option.environment == 'preprod':
-        config.option.markexpr = 'smoke'
-    else:
-        config.option.markexpr = 'not smoke'
+"""
+2. формируем url в зависимости от переменной "environment"
+"""
 
 
 @pytest.fixture(scope="session")
@@ -30,3 +32,15 @@ def get_urls(env):
     else:
         url = 'https://qa.lamoda.ru'
     return url
+
+
+"""
+3. формируем хуком "pytest_configure" скоп тестов в зависимости от значения "environment" -> тесты для "preprod"
+"""
+
+
+def pytest_configure(config):
+    if config.option.environment == 'preprod':
+        config.option.markexpr = 'smoke'
+    else:
+        config.option.markexpr = 'not smoke'
